@@ -19,6 +19,31 @@ Here's how to use the basic functionality of dashcamcsv:
     # Get summary information about the DataFrame
     info_summary(df)
 
+Data Cleaning
+------------
+
+The package provides flexible data cleaning capabilities:
+
+.. code-block:: python
+
+    from dashcamcsv import clean_data
+    
+    # Clean data with different strategies per column
+    clean_df = clean_data(df, strategies={
+        'sepal_length': 'median',  # Fill missing values with median
+        'species': 'mode',         # Fill missing values with most common value
+        'petal_width': 'drop',     # Drop rows where this column has missing values
+        'sepal_width': 'value:5.0' # Fill missing values with a specific value
+    })
+    
+    # Available strategies:
+    # - 'drop': Drop rows where this column has NaN
+    # - 'mean': Fill NaN with column mean (numeric columns only)
+    # - 'median': Fill NaN with column median (numeric columns only)
+    # - 'mode': Fill NaN with most frequent value
+    # - 'zero': Fill NaN with zero (numeric columns only)
+    # - 'value:X': Fill NaN with specific value X
+
 Visualization
 ------------
 

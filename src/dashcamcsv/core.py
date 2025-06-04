@@ -22,3 +22,62 @@ def info_summary(df: pd.DataFrame):
     print(df.dtypes)
     print("\nMemory Usage:")
     print(df.memory_usage(deep=True)) 
+
+def clean_data(df: pd.DataFrame, strategies: dict = None) -> pd.DataFrame:
+    """Perform basic data cleaning operations.
+    
+    Parameters:
+    -----------
+    df : pandas.DataFrame
+        The DataFrame to clean
+    strategies : dict, optional
+        Dictionary mapping column names to cleaning strategies.
+        Available strategies: 'drop', 'mean', 'median', 'mode', 'zero', 'value:X'
+        Example: {'age': 'median', 'name': 'drop', 'salary': 'value:0'}
+    
+    Returns:
+    --------
+    pandas.DataFrame
+        Cleaned DataFrame
+    """
+    result = df.copy()
+    
+    # If no strategies provided, use default (drop rows with any NaN)
+    if strategies is None:
+        return result.dropna()
+    
+    # Apply cleaning strategies by column
+    for col, strategy in strategies.items():
+        if col not in result.columns:
+            print(f"Warning: Column '{col}' not found in DataFrame")
+            continue
+            
+        if strategy == 'drop':
+            # Drop rows where this column has NaN
+            result = result.dropna(subset=[col])
+        elif strategy == 'mean' and pd.api.types.is_numeric_dtype(result[col]):
+            # Fill NaN with mean for numeric columns
+            result[col] = result[col].fillna(result[col].mean())
+        elif strategy == 'median' and pd.api.types.is_numeric_dtype(result[col]):
+            # Fill NaN with median for numeric columns
+            result[col] = result[col].fillna(result[col].median())
+        elif strategy == 'mode':
+            # Fill NaN with mode (most frequent value)
+            result[col] = result[col].fillna(result[col].mode()[0])
+        elif strategy == 'zero' and pd.api.types.is_numeric_dtype(result[col]):
+            # Fill NaN with zero for numeric columns
+            result[col] = result[col].fillna(0)
+        elif strategy.startswith('value:'):
+            # Fill NaN with specific value
+            fill_value = strategy.split(':', 1)[1]
+            # Convert value to appropriate type if possible
+            if pd.api.types.is_numeric_dtype(result[col]):
+                try:
+                    fill_value = float(fill_value)
+                except ValueError:
+                    pass
+            result[col] = result[col].fillna(fill_value)
+        else:
+            print(f"Warning: Unsupported strategy '{strategy}' for column '{col}'")
+    
+    return result 

@@ -1,6 +1,11 @@
 Changelog
 =========
 
+Version 0.2.5
+-----------
+* Added clean_data function for flexible data cleaning
+* Updated documentation and examples
+
 Version 0.2.4
 -----------
 * Added Read the Docs documentation
